@@ -1,0 +1,27 @@
+---
+- name: Setup | set kernel parameters
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+    reload: true
+    sysctl_set: true
+  become: true
+  loop:
+    - net.ipv4.ip_nonlocal_bind
+    - net.ipv4.ip_forward
+
+- name: Setup | template haproxy.conf
+  ansible.builtin.template:
+    dest: "{{ item.dest }}"
+    src: "{{ ansible_distribution | lower }}{{ item.dest + '.j2' }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    backup: true
+  loop:
+    - {dest: "/etc/haproxy/haproxy.cfg"}
+  become: true
+  notify:
+    - systemctl restart haproxy.service
+...

@@ -1,0 +1,9 @@
+---
+- name: Debian | Install package.
+  ansible.builtin.apt:
+    name: "haproxy"
+    state: present
+    allow_unauthenticated: false
+    update_cache: true
+  become: true
+...

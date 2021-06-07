@@ -1,0 +1,6 @@
+---
+keepalived_vip: ""
+mariadb_port: 3306
+keystone_port: 5000
+glance_port: 9292
+...
