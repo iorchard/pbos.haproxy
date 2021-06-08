@@ -59,3 +59,12 @@ listen glance
     {% for host in groups['glance'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check
     {% endfor %}
+
+listen placement
+    bind {{ keepalived_vip }}:{{ placement_port }}
+    mode tcp
+    option tcp-check
+    balance roundrobin
+    {% for host in groups['placement'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check
+    {% endfor %}
