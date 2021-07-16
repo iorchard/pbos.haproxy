@@ -1,70 +1,135 @@
 global
-	log /dev/log	local0
-	log /dev/log	local1 notice
-	chroot /var/lib/haproxy
-	stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
-	stats timeout 30s
-	user haproxy
-	group haproxy
-	daemon
+    maxconn 60000
+    log /dev/log    local0
+    log /dev/log    local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
 
-	# Default SSL material locations
-	ca-base /etc/ssl/certs
-	crt-base /etc/ssl/private
+    # Default SSL material locations
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
 
-	# See: https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.3&config=intermediate
+    # See: https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.3&config=intermediate
         ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
         ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
         ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
 
 defaults
-	log	global
-	mode	http
-	option	httplog
-	option	dontlognull
-        timeout connect 5000
-        timeout client  50000
-        timeout server  50000
-	errorfile 400 /etc/haproxy/errors/400.http
-	errorfile 403 /etc/haproxy/errors/403.http
-	errorfile 408 /etc/haproxy/errors/408.http
-	errorfile 500 /etc/haproxy/errors/500.http
-	errorfile 502 /etc/haproxy/errors/502.http
-	errorfile 503 /etc/haproxy/errors/503.http
-	errorfile 504 /etc/haproxy/errors/504.http
+    log    global
+    mode    http
+    option    httplog
+    option    dontlognull
+    timeout connect 5s
+    timeout client  600s
+    timeout server  600s
+    errorfile 400 /etc/haproxy/errors/400.http
+    errorfile 403 /etc/haproxy/errors/403.http
+    errorfile 408 /etc/haproxy/errors/408.http
+    errorfile 500 /etc/haproxy/errors/500.http
+    errorfile 502 /etc/haproxy/errors/502.http
+    errorfile 503 /etc/haproxy/errors/503.http
+    errorfile 504 /etc/haproxy/errors/504.http
+
+listen stats
+    bind *:8404
+    stats enable
+    stats uri /monitor
+    stats refresh 5s
 
 listen mariadb
     bind {{ keepalived_vip }}:{{ mariadb_port }}
     mode tcp
+    balance source
+    option tcpka
+    option tcplog
     option tcp-check
-    balance roundrobin
     {% for host in groups['mariadb'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ mariadb_port }} check
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ mariadb_port }} check inter 10s rise 2 fall 2
+    {% endfor %}
+
+listen rabbitmq
+    bind {{ keepalived_vip }}:{{ rabbitmq_port }}
+    mode tcp
+    balance source
+    option tcpka
+    option tcplog
+    option tcp-check
+    {% for host in groups['rabbitmq'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ rabbitmq_port }} check inter 10s rise 2 fall 2
     {% endfor %}
 
 listen keystone
     bind {{ keepalived_vip }}:{{ keystone_port }}
-    mode tcp
-    option tcp-check
-    balance roundrobin
+    balance source
+    option httpchk GET /
     {% for host in groups['keystone'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ keystone_port }} check
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ keystone_port }} check inter 10s rise 2 fall 2
     {% endfor %}
 
 listen glance
     bind {{ keepalived_vip }}:{{ glance_port }}
-    mode tcp
-    option tcp-check
-    balance roundrobin
+    balance source
+    option httpchk GET /
     {% for host in groups['glance'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check inter 10s rise 2 fall 2
     {% endfor %}
 
 listen placement
     bind {{ keepalived_vip }}:{{ placement_port }}
-    mode tcp
-    option tcp-check
-    balance roundrobin
+    balance source
+    option httpchk GET /
     {% for host in groups['placement'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check inter 10s rise 2 fall 2
+    {% endfor %}
+
+listen neutron
+    bind {{ keepalived_vip }}:{{ neutron_port }}
+    balance source
+    option httpchk GET /
+    {% for host in groups['controller'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ neutron_port }} check inter 10s rise 2 fall 2
+    {% endfor %}
+
+listen cinder
+    bind {{ keepalived_vip }}:{{ cinder_port }}
+    balance source
+    option httpchk GET /
+    {% for host in groups['cinder'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ cinder_port }} check inter 10s rise 2 fall 2
+    {% endfor %}
+
+listen nova
+    bind {{ keepalived_vip }}:{{ nova_port }}
+    balance source
+    option httpchk GET /
+    {% for host in groups['controller'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_port }} check inter 10s rise 2 fall 2
+    {% endfor %}
+
+listen nova-metadata
+    bind {{ keepalived_vip }}:{{ nova_metadata_port }}
+    balance source
+    option httpchk GET /
+    {% for host in groups['controller'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_metadata_port }} check inter 10s rise 2 fall 2
+    {% endfor %}
+
+listen horizon
+    bind {{ keepalived_vip }}:{{ horizon_http_port }}
+    balance source
+    option httpchk GET /
+    {% for host in groups['controller'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ horizon_http_port }} check inter 10s rise 2 fall 2
+    {% endfor %}
+
+listen barbican
+    bind {{ keepalived_vip }}:{{ barbican_port }}
+    balance source
+    option httpchk GET /
+    {% for host in groups['barbican'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 10s rise 2 fall 2
     {% endfor %}

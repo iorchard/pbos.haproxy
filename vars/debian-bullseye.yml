@@ -1,2 +1,6 @@
 ---
+service_conf:
+  - {dest: "/etc/haproxy/haproxy.cfg"}
+systemd_service_name:
+  - haproxy.service
 ...

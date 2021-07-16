@@ -19,9 +19,9 @@
     group: "root"
     mode: "0644"
     backup: true
-  loop:
-    - {dest: "/etc/haproxy/haproxy.cfg"}
+  loop: "{{ service_conf }}"
   become: true
+  changed_when: true
   notify:
-    - systemctl restart haproxy.service
+    - systemctl restart service
 ...
