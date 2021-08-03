@@ -21,9 +21,7 @@
     - haproxy
     - pbos-infra
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ haproxy_conf_dir }}"
     state: absent
-  loop:
-    - /etc/haproxy
   become: true
 ...
