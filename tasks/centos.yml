@@ -1,5 +1,5 @@
 ---
-- name: Ubuntu | install packages
+- name: CentOS | install packages.
   ansible.builtin.package:
     name: "{{ item }}"
     state: "{{ pkg_state }}"
