@@ -129,10 +129,9 @@ listen nova-novncproxy
 listen horizon
     bind {{ keepalived_vip }}:{{ horizon_http_port }}
     balance source
-    cookie SERVERID insert indirect nocache
     option httpchk GET /
     {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ horizon_http_port }} cookie {{ hostvars[host].inventory_hostname }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ horizon_http_port }} check inter 10s rise 2 fall 2
     {% endfor %}
 
 listen barbican
