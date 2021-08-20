@@ -1,5 +1,5 @@
 ---
-- name: CentOS | install packages.
+- name: Rocky Linux | install packages.
   ansible.builtin.package:
     name: "{{ item }}"
     state: "{{ pkg_state }}"

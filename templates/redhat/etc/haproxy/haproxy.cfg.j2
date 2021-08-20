@@ -28,6 +28,17 @@ defaults
     timeout check           10s
     maxconn                 3000
 
+listen memcached
+    bind {{ keepalived_vip }}:{{ memcached_port }}
+    mode tcp
+    balance source
+    option tcpka
+    option tcplog
+    option tcp-check
+    {% for host in groups['controller'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ memcached_port }} check inter 10s rise 2 fall 2
+    {% endfor %}
+
 listen mariadb
     bind {{ keepalived_vip }}:{{ mariadb_port }}
     mode tcp

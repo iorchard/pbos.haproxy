@@ -1,6 +1,8 @@
 ---
 pkg_state: "latest"
 
+memcached_port: 11211
+
 packages:
   - haproxy
 
