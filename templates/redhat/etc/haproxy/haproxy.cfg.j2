@@ -36,7 +36,7 @@ listen memcached
     option tcplog
     option tcp-check
     {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ memcached_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ memcached_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen mariadb
@@ -47,7 +47,7 @@ listen mariadb
     option tcplog
     option tcp-check
     {% for host in groups['mariadb'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ mariadb_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ mariadb_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen rabbitmq
@@ -58,7 +58,7 @@ listen rabbitmq
     option tcplog
     option tcp-check
     {% for host in groups['rabbitmq'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ rabbitmq_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ rabbitmq_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen keystone
@@ -66,7 +66,7 @@ listen keystone
     balance source
     option httpchk GET /
     {% for host in groups['keystone'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ keystone_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen glance
@@ -74,7 +74,7 @@ listen glance
     balance source
     option httpchk GET /
     {% for host in groups['glance'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen placement
@@ -82,7 +82,7 @@ listen placement
     balance source
     option httpchk GET /
     {% for host in groups['placement'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen neutron
@@ -90,7 +90,7 @@ listen neutron
     balance source
     option httpchk GET /
     {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ neutron_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen cinder
@@ -98,7 +98,7 @@ listen cinder
     balance source
     option httpchk GET /
     {% for host in groups['cinder'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ cinder_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen nova
@@ -106,7 +106,7 @@ listen nova
     balance source
     option httpchk GET /
     {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen nova-metadata
@@ -114,7 +114,15 @@ listen nova-metadata
     balance source
     option httpchk GET /
     {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_metadata_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_metadata_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+
+listen nova-novncproxy
+    bind {{ keepalived_vip }}:{{ nova_novncproxy_port }}
+    balance source
+    option httpchk GET /vnc_auto.html
+    {% for host in groups['controller'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_novncproxy_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen horizon
@@ -122,7 +130,7 @@ listen horizon
     balance source
     option httpchk GET /
     {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ horizon_http_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ horizon_http_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen barbican
@@ -130,5 +138,5 @@ listen barbican
     balance source
     option httpchk GET /
     {% for host in groups['barbican'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 10s rise 2 fall 2
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
     {% endfor %}
