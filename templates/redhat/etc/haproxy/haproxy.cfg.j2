@@ -128,7 +128,7 @@ listen nova-novncproxy
 listen horizon
     bind {{ keepalived_vip }}:{{ horizon_http_port }}
     balance source
-    option httpchk GET /
+    option httpchk GET /dashboard/auth/login/
     {% for host in groups['controller'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ horizon_http_port }} check inter 5s rise 2 fall 2
     {% endfor %}
