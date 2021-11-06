@@ -61,6 +61,17 @@ listen rabbitmq
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ rabbitmq_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
+listen rabbitmq-tls
+    bind {{ keepalived_vip }}:{{ rabbitmq_tls_port }}
+    mode tcp
+    balance source
+    option tcpka
+    option tcplog
+    option tcp-check
+    {% for host in groups['rabbitmq'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ rabbitmq_tls_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+
 listen keystone
     bind {{ keepalived_vip }}:{{ keystone_port }}
     balance source

@@ -3,6 +3,7 @@ service_name: "haproxy"
 keepalived_vip: ~
 mariadb_port: 3306
 rabbitmq_port: 5672
+rabbitmq_tls_port: 5671
 keystone_port: 5000
 glance_port: 9292
 placement_port: 8778
