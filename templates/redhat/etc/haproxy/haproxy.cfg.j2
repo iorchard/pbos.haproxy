@@ -137,7 +137,7 @@ listen nova-metadata
     {% endfor %}
 
 listen nova-novncproxy
-    bind {{ keepalived_vip }}:{{ nova_novncproxy_port }}
+    bind {% if keepalived_vip_svc != "" %}{{ keepalived_vip_svc }}{% else %}{{ keepalived_vip }}{% endif %}:{{ nova_novncproxy_port }}
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /vnc_auto.html
