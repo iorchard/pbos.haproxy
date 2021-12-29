@@ -75,7 +75,7 @@ listen rabbitmq-tls
 
 listen keystone
     bind {{ keepalived_vip }}:{{ keystone_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
     {% for host in groups['keystone'] %}
@@ -84,7 +84,7 @@ listen keystone
 
 listen glance
     bind {{ keepalived_vip }}:{{ glance_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
     {% for host in groups['glance'] %}
@@ -93,7 +93,7 @@ listen glance
 
 listen placement
     bind {{ keepalived_vip }}:{{ placement_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
     {% for host in groups['placement'] %}
@@ -102,7 +102,7 @@ listen placement
 
 listen neutron
     bind {{ keepalived_vip }}:{{ neutron_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
     {% for host in groups['controller'] %}
@@ -111,7 +111,7 @@ listen neutron
 
 listen cinder
     bind {{ keepalived_vip }}:{{ cinder_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
     {% for host in groups['cinder'] %}
@@ -120,7 +120,7 @@ listen cinder
 
 listen nova
     bind {{ keepalived_vip }}:{{ nova_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
     {% for host in groups['controller'] %}
@@ -129,7 +129,7 @@ listen nova
 
 listen nova-metadata
     bind {{ keepalived_vip }}:{{ nova_metadata_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
     {% for host in groups['controller'] %}
@@ -138,7 +138,7 @@ listen nova-metadata
 
 listen nova-novncproxy
     bind {{ keepalived_vip }}:{{ nova_novncproxy_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /vnc_auto.html
     {% for host in groups['controller'] %}
@@ -146,8 +146,8 @@ listen nova-novncproxy
     {% endfor %}
 
 listen horizon
-    bind {{ keepalived_vip }}:{{ horizon_http_port }}
-    option					forwardfor       except 127.0.0.0/8
+    bind {% if keepalived_vip_svc != "" %}{{ keepalived_vip_svc }}{% else %}{{ keepalived_vip }}{% endif %}:{{ horizon_http_port }}
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /dashboard/auth/login/
     {% for host in groups['controller'] %}
@@ -156,7 +156,7 @@ listen horizon
 
 listen barbican
     bind {{ keepalived_vip }}:{{ barbican_port }}
-    option					forwardfor       except 127.0.0.0/8
+    option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
     {% for host in groups['barbican'] %}
