@@ -84,6 +84,8 @@ listen keystone
 
 listen glance
     bind {{ keepalived_vip }}:{{ glance_port }}
+    timeout client          10m
+    timeout server          10m
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
