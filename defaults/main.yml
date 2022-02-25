@@ -12,6 +12,6 @@ cinder_port: 8776
 nova_port: 8774
 nova_metadata_port: 8775
 nova_novncproxy_port: 6080
-horizon_http_port: 8000
+horizon_http_port: 8800
 barbican_port: 9311
 ...
