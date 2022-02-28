@@ -164,3 +164,21 @@ listen barbican
     {% for host in groups['barbican'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+
+listen heat
+    bind {{ keepalived_vip }}:{{ heat_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['heat'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+
+listen heat-cfn
+    bind {{ keepalived_vip }}:{{ heat_cfn_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['heat'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
+    {% endfor %}

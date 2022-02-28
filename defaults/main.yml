@@ -14,4 +14,6 @@ nova_metadata_port: 8775
 nova_novncproxy_port: 6080
 horizon_http_port: 8800
 barbican_port: 9311
+heat_port: 8004
+heat_cfn_port: 8000
 ...
