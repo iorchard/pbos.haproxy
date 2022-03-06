@@ -182,3 +182,12 @@ listen heat-cfn
     {% for host in groups['heat'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+
+listen magnum
+    bind {{ keepalived_vip }}:{{ magnum_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['magnum'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
