@@ -171,6 +171,7 @@ listen barbican
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
+{% if 'heat' in groups %}
 listen heat
     bind {{ keepalived_vip }}:{{ heat_port }}
     option forwardfor except 127.0.0.0/8
@@ -188,7 +189,9 @@ listen heat-cfn
     {% for host in groups['heat'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+{% endif %}
 
+{% if 'magnum' in groups %}
 listen magnum
     bind {{ keepalived_vip }}:{{ magnum_port }}
     option forwardfor except 127.0.0.0/8
@@ -197,7 +200,9 @@ listen magnum
     {% for host in groups['magnum'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+{% endif %}
 
+{% if 'octavia' in groups %}
 listen octavia
     bind {{ keepalived_vip }}:{{ octavia_port }}
     option forwardfor except 127.0.0.0/8
@@ -206,5 +211,4 @@ listen octavia
     {% for host in groups['octavia'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
     {% endfor %}
-
-
+{% endif %}
