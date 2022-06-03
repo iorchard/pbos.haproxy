@@ -88,6 +88,17 @@ listen keystone
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
+{% if keepalived_vip_svc %}
+listen keystone-public
+    bind {{ keepalived_vip_svc }}:{{ keystone_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['keystone'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
+
 listen glance
     bind {{ keepalived_vip }}:{{ glance_port }}
     timeout client          10m
@@ -99,6 +110,19 @@ listen glance
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
+{% if keepalived_vip_svc %}
+listen glance-public
+    bind {{ keepalived_vip_svc }}:{{ glance_port }}
+    timeout client          10m
+    timeout server          10m
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['glance'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
+
 listen placement
     bind {{ keepalived_vip }}:{{ placement_port }}
     option forwardfor except 127.0.0.0/8
@@ -107,6 +131,17 @@ listen placement
     {% for host in groups['placement'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+
+{% if keepalived_vip_svc %}
+listen placement-public
+    bind {{ keepalived_vip_svc }}:{{ placement_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['placement'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
 
 listen neutron
     bind {{ keepalived_vip }}:{{ neutron_port }}
@@ -117,6 +152,17 @@ listen neutron
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
+{% if keepalived_vip_svc %}
+listen neutron-public
+    bind {{ keepalived_vip_svc }}:{{ neutron_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['controller'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
+
 listen cinder
     bind {{ keepalived_vip }}:{{ cinder_port }}
     option forwardfor except 127.0.0.0/8
@@ -126,6 +172,17 @@ listen cinder
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
+{% if keepalived_vip_svc %}
+listen cinder-public
+    bind {{ keepalived_vip_svc }}:{{ cinder_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['cinder'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
+
 listen nova
     bind {{ keepalived_vip }}:{{ nova_port }}
     option forwardfor except 127.0.0.0/8
@@ -134,6 +191,17 @@ listen nova
     {% for host in groups['controller'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+
+{% if keepalived_vip_svc %}
+listen nova-public
+    bind {{ keepalived_vip_svc }}:{{ nova_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['controller'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
 
 listen nova-metadata
     bind {{ keepalived_vip }}:{{ nova_metadata_port }}
@@ -171,6 +239,17 @@ listen barbican
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
+{% if keepalived_vip_svc %}
+listen barbican-public
+    bind {{ keepalived_vip_svc }}:{{ barbican_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['barbican'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
+
 {% if 'heat' in groups %}
 listen heat
     bind {{ keepalived_vip }}:{{ heat_port }}
@@ -181,6 +260,17 @@ listen heat
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
+{% if keepalived_vip_svc %}
+listen heat-public
+    bind {{ keepalived_vip_svc }}:{{ heat_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['heat'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
+
 listen heat-cfn
     bind {{ keepalived_vip }}:{{ heat_cfn_port }}
     option forwardfor except 127.0.0.0/8
@@ -189,6 +279,17 @@ listen heat-cfn
     {% for host in groups['heat'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+
+{% if keepalived_vip_svc %}
+listen heat-cfn-public
+    bind {{ keepalived_vip_svc }}:{{ heat_cfn_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['heat'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
 {% endif %}
 
 {% if 'magnum' in groups %}
@@ -200,6 +301,17 @@ listen magnum
     {% for host in groups['magnum'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+
+{% if keepalived_vip_svc %}
+listen magnum-public
+    bind {{ keepalived_vip_svc }}:{{ magnum_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['magnum'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
 {% endif %}
 
 {% if 'octavia' in groups %}
@@ -211,4 +323,15 @@ listen octavia
     {% for host in groups['octavia'] %}
     server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
     {% endfor %}
+
+{% if keepalived_vip_svc %}
+listen octavia-public
+    bind {{ keepalived_vip_svc }}:{{ octavia_port }}
+    option forwardfor except 127.0.0.0/8
+    balance source
+    option httpchk GET /
+    {% for host in groups['octavia'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
+    {% endfor %}
+{% endif %}
 {% endif %}
