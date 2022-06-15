@@ -11,6 +11,18 @@
     - net.ipv4.ip_nonlocal_bind
     - net.ipv4.ip_forward
 
+- name: Setup | copy rsyslog haproxy configuration
+  ansible.builtin.copy:
+    src: "{{ ansible_os_family | lower }}{{ item.dest }}"
+    dest: "{{ item.dest }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  become: true
+  loop: "{{ rsyslog_conf }}"
+  notify:
+    - systemctl restart service
+   
 - name: Setup | template haproxy.conf
   ansible.builtin.template:
     dest: "{{ item.dest }}"

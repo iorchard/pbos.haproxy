@@ -8,9 +8,13 @@ packages:
 
 haproxy_conf_dir: "/etc/haproxy"
 
+rsyslog_conf:
+  - {dest: "/etc/rsyslog.d/haproxy.conf"}
+
 service_conf:
   - {dest: "{{ haproxy_conf_dir }}/haproxy.cfg"}
 
 systemd_service_name:
+  - rsyslog.service
   - haproxy.service
 ...
