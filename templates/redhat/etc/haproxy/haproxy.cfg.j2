@@ -59,10 +59,11 @@ listen mariadb
     option tcp-check
     {% if mariadb_ha_mode == 'active-standby' %}
     stick-table type ip size {{ groups['mariadb']|length }} peers mariadb-peer
-    stick on dst{% endif %}
-    {% for host in groups['mariadb'] +%}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ mariadb_port }} check inter 5s rise 2 fall 2 {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif %}
-    {% endfor +%}
+    stick on dst
+    {% endif %}
+    {% for host in groups['mariadb'] %}
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ mariadb_port }} check inter 5s rise 2 fall 2 {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
+    {% endfor %}
 
 listen rabbitmq
     bind {{ keepalived_vip }}:{{ rabbitmq_port }}
