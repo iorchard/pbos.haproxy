@@ -37,14 +37,14 @@ listen memcached
     option tcpka
     option tcplog
     option tcp-check
-    {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ memcached_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['controller'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ memcached_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if mariadb_ha_mode == 'active-standby' %}
 peers mariadb-peer
-  {% for host in groups['mariadb'] %}
-    peer {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:3307
+  {% for h in groups['mariadb'] %}
+    peer {{ h }} {{ hostvars[h].ansible_host }}:3307
   {% endfor %}
 {% endif %}
 
@@ -61,8 +61,8 @@ listen mariadb
     stick-table type ip size {{ groups['mariadb']|length }} peers mariadb-peer
     stick on dst
     {% endif %}
-    {% for host in groups['mariadb'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ mariadb_port }} check inter 5s rise 2 fall 2 {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
+    {% for h in groups['mariadb'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter 5s rise 2 fall 2 {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 listen rabbitmq
@@ -74,8 +74,8 @@ listen rabbitmq
     option tcpka
     option tcplog
     option tcp-check
-    {% for host in groups['rabbitmq'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ rabbitmq_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['rabbitmq'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen rabbitmq-tls
@@ -87,8 +87,8 @@ listen rabbitmq-tls
     option tcpka
     option tcplog
     option tcp-check
-    {% for host in groups['rabbitmq'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ rabbitmq_tls_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['rabbitmq'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen keystone
@@ -96,8 +96,8 @@ listen keystone
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['keystone'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['keystone'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -106,8 +106,8 @@ listen keystone-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['keystone'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['keystone'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 
@@ -118,8 +118,8 @@ listen glance
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['glance'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['glance'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -130,8 +130,8 @@ listen glance-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['glance'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['glance'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 
@@ -140,8 +140,8 @@ listen placement
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['placement'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['placement'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -150,8 +150,8 @@ listen placement-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['placement'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['placement'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 
@@ -160,8 +160,8 @@ listen neutron
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['controller'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -170,8 +170,8 @@ listen neutron-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['controller'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 
@@ -180,8 +180,8 @@ listen cinder
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['cinder'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['cinder'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -190,8 +190,8 @@ listen cinder-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['cinder'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['cinder'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 
@@ -200,8 +200,8 @@ listen nova
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['controller'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -210,8 +210,8 @@ listen nova-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['controller'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 
@@ -220,8 +220,8 @@ listen nova-metadata
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_metadata_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['controller'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_metadata_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen nova-novncproxy
@@ -229,8 +229,8 @@ listen nova-novncproxy
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /vnc_auto.html
-    {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ nova_novncproxy_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['controller'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_novncproxy_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen horizon
@@ -238,8 +238,8 @@ listen horizon
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /dashboard/auth/login/
-    {% for host in groups['controller'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ horizon_http_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['controller'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ horizon_http_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 listen barbican
@@ -247,8 +247,8 @@ listen barbican
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['barbican'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['barbican'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -257,8 +257,8 @@ listen barbican-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['barbican'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['barbican'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 
@@ -268,8 +268,8 @@ listen heat
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['heat'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['heat'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -278,8 +278,8 @@ listen heat-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['heat'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['heat'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 
@@ -288,8 +288,8 @@ listen heat-cfn
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['heat'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['heat'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -298,8 +298,8 @@ listen heat-cfn-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['heat'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['heat'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 {% endif %}
@@ -310,8 +310,8 @@ listen magnum
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['magnum'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['magnum'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -320,8 +320,8 @@ listen magnum-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['magnum'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['magnum'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 {% endif %}
@@ -332,8 +332,8 @@ listen octavia
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['octavia'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['octavia'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -342,8 +342,8 @@ listen octavia-public
     option forwardfor except 127.0.0.0/8
     balance source
     option httpchk GET /
-    {% for host in groups['octavia'] %}
-    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
+    {% for h in groups['octavia'] %}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
     {% endfor %}
 {% endif %}
 {% endif %}
