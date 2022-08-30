@@ -1,6 +1,6 @@
 ---
 - name: systemctl restart service
-  service:
+  ansible.builtin.service:
     name: "{{ item }}"
     state: "restarted"
     enabled: true
@@ -13,7 +13,7 @@
   loop: "{{ systemd_service_name }}"
 
 - name: systemctl stop service
-  service:
+  ansible.builtin.service:
     name: "{{ item }}"
     state: "stopped"
     enabled: true

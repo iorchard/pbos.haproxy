@@ -19,4 +19,39 @@ heat_cfn_port: 8000
 magnum_port: 9511
 octavia_port: 9876
 mariadb_ha_mode: 'multi-master'
+# balance: roundrobin, static-rr, leastconn, source, first
+balance: roundrobin
+# check interval in seconds
+inter: 2s
+# rise: a server considered as alive after <count> consecutive 
+# successful health checks: default 2
+rise: 2
+# fall: a server considered as dead after <count> consecutive 
+# successful health checks: default 3
+fall: 3
+# TLS
+ca_passphrase: ~
+tls_tmp_dir: "/tmp/haproxy_tls"
+tls_subj: {
+  country_name: "KR",
+  state_or_province_name: "Gangwon-Do",
+  locality_name: "Wonju-Si",
+  organization_name: "iOrchard",
+  common_name: "pbos-haproxy",
+  email_address: "support@iorchard.co.kr"
+}
+tls_ca_dir: "/etc/pki/pbos"
+tls_ca: {
+  key: "{{ tls_ca_dir }}/ca-key.pem",
+  crt: "{{ tls_ca_dir }}/ca-cert.pem"
+}
+tls_tmp_server: {
+  key: "{{ tls_tmp_dir }}/server-key.pem",
+}
+tls_days: "+3650d"
+tls_server_dir: "/etc/haproxy/certificates"
+tls_server_key: "{{ tls_server_dir }}/server-key.pem"
+tls_server_cert: "{{ tls_server_dir }}/server-cert.pem"
+tls_server_ca_cert: "{{ tls_server_dir }}/ca-cert.pem"
+tls_server_cert_and_key: "{{ tls_server_dir }}/server.pem"
 ...

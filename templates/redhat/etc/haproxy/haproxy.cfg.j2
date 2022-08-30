@@ -33,12 +33,12 @@ listen memcached
     mode tcp
     timeout client 8h
     timeout server 8h
-    balance source
+    balance {{ balance }}
     option tcpka
     option tcplog
     option tcp-check
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ memcached_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ memcached_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if mariadb_ha_mode == 'active-standby' %}
@@ -53,7 +53,7 @@ listen mariadb
     mode tcp
     timeout client 8h
     timeout server 8h
-    balance source
+    balance {{ balance }}
     option tcpka
     option tcplog
     option tcp-check
@@ -62,7 +62,7 @@ listen mariadb
     stick on dst
     {% endif %}
     {% for h in groups['mariadb'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter 5s rise 2 fall 2 {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 listen rabbitmq
@@ -70,12 +70,12 @@ listen rabbitmq
     mode tcp
     timeout client 8h
     timeout server 8h
-    balance source
+    balance {{ balance }}
     option tcpka
     option tcplog
     option tcp-check
     {% for h in groups['rabbitmq'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 listen rabbitmq-tls
@@ -83,31 +83,31 @@ listen rabbitmq-tls
     mode tcp
     timeout client 8h
     timeout server 8h
-    balance source
+    balance {{ balance }}
     option tcpka
     option tcplog
     option tcp-check
     {% for h in groups['rabbitmq'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 listen keystone
     bind {{ keepalived_vip }}:{{ keystone_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance  {{ balance }}
     option httpchk GET /
     {% for h in groups['keystone'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen keystone-public
     bind {{ keepalived_vip_svc }}:{{ keystone_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['keystone'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 
@@ -116,10 +116,10 @@ listen glance
     timeout client          10m
     timeout server          10m
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['glance'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -128,137 +128,137 @@ listen glance-public
     timeout client          10m
     timeout server          10m
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['glance'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 
 listen placement
     bind {{ keepalived_vip }}:{{ placement_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['placement'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen placement-public
     bind {{ keepalived_vip_svc }}:{{ placement_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['placement'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 
 listen neutron
     bind {{ keepalived_vip }}:{{ neutron_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen neutron-public
     bind {{ keepalived_vip_svc }}:{{ neutron_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 
 listen cinder
     bind {{ keepalived_vip }}:{{ cinder_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['cinder'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen cinder-public
     bind {{ keepalived_vip_svc }}:{{ cinder_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['cinder'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 
 listen nova
     bind {{ keepalived_vip }}:{{ nova_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen nova-public
     bind {{ keepalived_vip_svc }}:{{ nova_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 
 listen nova-metadata
     bind {{ keepalived_vip }}:{{ nova_metadata_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_metadata_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_metadata_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 listen nova-novncproxy
     bind {% if keepalived_vip_svc != "" %}{{ keepalived_vip_svc }}{% else %}{{ keepalived_vip }}{% endif %}:{{ nova_novncproxy_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /vnc_auto.html
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_novncproxy_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_novncproxy_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 listen horizon
     bind {% if keepalived_vip_svc != "" %}{{ keepalived_vip_svc }}{% else %}{{ keepalived_vip }}{% endif %}:{{ horizon_http_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /dashboard/auth/login/
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ horizon_http_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ horizon_http_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 listen barbican
     bind {{ keepalived_vip }}:{{ barbican_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['barbican'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen barbican-public
     bind {{ keepalived_vip_svc }}:{{ barbican_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['barbican'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 
@@ -266,40 +266,40 @@ listen barbican-public
 listen heat
     bind {{ keepalived_vip }}:{{ heat_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen heat-public
     bind {{ keepalived_vip_svc }}:{{ heat_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 
 listen heat-cfn
     bind {{ keepalived_vip }}:{{ heat_cfn_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen heat-cfn-public
     bind {{ keepalived_vip_svc }}:{{ heat_cfn_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 {% endif %}
@@ -308,20 +308,20 @@ listen heat-cfn-public
 listen magnum
     bind {{ keepalived_vip }}:{{ magnum_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['magnum'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen magnum-public
     bind {{ keepalived_vip_svc }}:{{ magnum_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['magnum'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 {% endif %}
@@ -330,20 +330,20 @@ listen magnum-public
 listen octavia
     bind {{ keepalived_vip }}:{{ octavia_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['octavia'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
 listen octavia-public
     bind {{ keepalived_vip_svc }}:{{ octavia_port }}
     option forwardfor except 127.0.0.0/8
-    balance source
+    balance {{ balance }}
     option httpchk GET /
     {% for h in groups['octavia'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter 5s rise 2 fall 2
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
     {% endfor %}
 {% endif %}
 {% endif %}
