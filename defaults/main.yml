@@ -19,16 +19,19 @@ heat_cfn_port: 8000
 magnum_port: 9511
 octavia_port: 9876
 mariadb_ha_mode: 'multi-master'
-# balance: roundrobin, static-rr, leastconn, source, first
+# balance: roundrobin, static-rr, leastconn, source, first. default: roundrobin
 balance: roundrobin
-# check interval in seconds
+# check interval in seconds default: 2s
 inter: 2s
 # rise: a server considered as alive after <count> consecutive 
-# successful health checks: default 2
+# successful health checks. default: 2
 rise: 2
 # fall: a server considered as dead after <count> consecutive 
-# successful health checks: default 3
+# successful health checks. default: 3
 fall: 3
+# enable_public_svc: (boolean) enable public service for mariadb and rabbitmq
+# default: false
+enable_public_svc: false
 # TLS
 ca_passphrase: ~
 tls_tmp_dir: "/tmp/haproxy_tls"
