@@ -1,18 +1,12 @@
 ---
-pkg_state: "latest"
-
-memcached_port: 11211
-
 packages:
   - haproxy
-
-haproxy_conf_dir: "/etc/haproxy"
 
 rsyslog_conf:
   - {dest: "/etc/rsyslog.d/haproxy.conf"}
 
 service_conf:
-  - {dest: "{{ haproxy_conf_dir }}/haproxy.cfg"}
+    - {dest: "{{ haproxy_conf_dir }}/haproxy.cfg", src: "{{ force_active_standby | ternary('{{ haproxy_conf_dir }}/haproxy.cfg_active_standby', '{{ haproxy_conf_dir }}/haproxy.cfg') }}"}
 
 systemd_service_name:
   - rsyslog.service

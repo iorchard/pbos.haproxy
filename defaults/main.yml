@@ -1,6 +1,11 @@
 ---
+# force_active_standby
+# default hamode is multi-master.
+# If you want to use active-standby mode, enable this.
+force_active_standby: false
 service_name: "haproxy"
 keepalived_vip: ~
+memcached_port: 11211
 mariadb_port: 3306
 rabbitmq_port: 5672
 rabbitmq_tls_port: 5671
@@ -18,7 +23,6 @@ heat_port: 8004
 heat_cfn_port: 8000
 magnum_port: 9511
 octavia_port: 9876
-mariadb_ha_mode: 'multi-master'
 # balance: roundrobin, static-rr, leastconn, source, first. default: roundrobin
 balance: roundrobin
 # check interval in seconds default: 2s

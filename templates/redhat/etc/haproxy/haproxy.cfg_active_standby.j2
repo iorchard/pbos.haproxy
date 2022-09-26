@@ -37,8 +37,10 @@ listen memcached
     option tcpka
     option tcplog
     option tcp-check
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ memcached_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ memcached_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 listen mariadb
@@ -50,12 +52,10 @@ listen mariadb
     option tcpka
     option tcplog
     option tcp-check
-    {% if mariadb_ha_mode == 'active-standby' %}
     stick-table type integer size 1 expire 1d
     stick on int(1)
-    {% endif %}
     {% for h in groups['mariadb'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc and enable_public_svc %}
@@ -68,12 +68,10 @@ listen mariadb-public
     option tcpka
     option tcplog
     option tcp-check
-    {% if mariadb_ha_mode == 'active-standby' %}
-    stick-table type ip size {{ groups['mariadb']|length }} peers mariadb-peer
-    stick on dst
-    {% endif %}
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['mariadb'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -86,8 +84,10 @@ listen rabbitmq
     option tcpka
     option tcplog
     option tcp-check
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['rabbitmq'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 listen rabbitmq-tls
@@ -99,8 +99,10 @@ listen rabbitmq-tls
     option tcpka
     option tcplog
     option tcp-check
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['rabbitmq'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc and enable_public_svc %}
@@ -113,8 +115,10 @@ listen rabbitmq-tls-public
     option tcpka
     option tcplog
     option tcp-check
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['rabbitmq'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -123,8 +127,10 @@ listen keystone
     option forwardfor except 127.0.0.0/8
     balance  {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['keystone'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -133,8 +139,10 @@ listen keystone-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['keystone'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -145,8 +153,10 @@ listen glance
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['glance'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -157,8 +167,10 @@ listen glance-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['glance'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -167,8 +179,10 @@ listen placement
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['placement'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -177,8 +191,10 @@ listen placement-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['placement'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -187,8 +203,10 @@ listen neutron
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -197,8 +215,10 @@ listen neutron-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -207,8 +227,10 @@ listen cinder
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['cinder'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -217,8 +239,10 @@ listen cinder-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['cinder'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -227,8 +251,10 @@ listen nova
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -237,8 +263,10 @@ listen nova-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -247,8 +275,10 @@ listen nova-metadata
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_metadata_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_metadata_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 listen nova-novncproxy
@@ -256,8 +286,10 @@ listen nova-novncproxy
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /vnc_auto.html
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_novncproxy_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_novncproxy_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 listen horizon
@@ -265,8 +297,10 @@ listen horizon
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /dashboard/auth/login/
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ horizon_http_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ horizon_http_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 listen barbican
@@ -274,8 +308,10 @@ listen barbican
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['barbican'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -284,8 +320,10 @@ listen barbican-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['barbican'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -295,8 +333,10 @@ listen heat
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -305,8 +345,10 @@ listen heat-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 
@@ -315,8 +357,10 @@ listen heat-cfn
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -325,8 +369,10 @@ listen heat-cfn-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 {% endif %}
@@ -337,8 +383,10 @@ listen magnum
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['magnum'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -347,8 +395,10 @@ listen magnum-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['magnum'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 {% endif %}
@@ -359,8 +409,10 @@ listen octavia
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['octavia'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -369,8 +421,10 @@ listen octavia-public
     option forwardfor except 127.0.0.0/8
     balance {{ balance }}
     option httpchk GET /
+    stick-table type integer size 1 expire 1d
+    stick on int(1)
     {% for h in groups['octavia'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if loop.index != 1 %}backup{% endif +%}
     {% endfor %}
 {% endif %}
 {% endif %}
