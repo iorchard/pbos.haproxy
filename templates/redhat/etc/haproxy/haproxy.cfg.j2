@@ -38,7 +38,7 @@ listen memcached
     option tcplog
     option tcp-check
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ memcached_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ memcached_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 listen mariadb
@@ -50,12 +50,8 @@ listen mariadb
     option tcpka
     option tcplog
     option tcp-check
-    {% if mariadb_ha_mode == 'active-standby' %}
-    stick-table type integer size 1 expire 1d
-    stick on int(1)
-    {% endif %}
     {% for h in groups['mariadb'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc and enable_public_svc %}
@@ -68,12 +64,8 @@ listen mariadb-public
     option tcpka
     option tcplog
     option tcp-check
-    {% if mariadb_ha_mode == 'active-standby' %}
-    stick-table type ip size {{ groups['mariadb']|length }} peers mariadb-peer
-    stick on dst
-    {% endif %}
     {% for h in groups['mariadb'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} {% if mariadb_ha_mode == 'active-standby' and loop.index != 1 %}backup{% endif +%}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ mariadb_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -87,7 +79,7 @@ listen rabbitmq
     option tcplog
     option tcp-check
     {% for h in groups['rabbitmq'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 listen rabbitmq-tls
@@ -100,7 +92,7 @@ listen rabbitmq-tls
     option tcplog
     option tcp-check
     {% for h in groups['rabbitmq'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc and enable_public_svc %}
@@ -114,7 +106,7 @@ listen rabbitmq-tls-public
     option tcplog
     option tcp-check
     {% for h in groups['rabbitmq'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ rabbitmq_tls_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -124,7 +116,7 @@ listen keystone
     balance  {{ balance }}
     option httpchk GET /
     {% for h in groups['keystone'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -134,7 +126,7 @@ listen keystone-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['keystone'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ keystone_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -146,7 +138,7 @@ listen glance
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['glance'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -158,7 +150,7 @@ listen glance-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['glance'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ glance_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -168,7 +160,7 @@ listen placement
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['placement'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -178,7 +170,7 @@ listen placement-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['placement'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ placement_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -188,7 +180,7 @@ listen neutron
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -198,7 +190,7 @@ listen neutron-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ neutron_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -208,7 +200,7 @@ listen cinder
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['cinder'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -218,7 +210,7 @@ listen cinder-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['cinder'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ cinder_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -228,7 +220,7 @@ listen nova
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -238,7 +230,7 @@ listen nova-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -248,7 +240,7 @@ listen nova-metadata
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_metadata_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_metadata_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 listen nova-novncproxy
@@ -257,7 +249,7 @@ listen nova-novncproxy
     balance {{ balance }}
     option httpchk GET /vnc_auto.html
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_novncproxy_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ nova_novncproxy_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 listen horizon
@@ -266,7 +258,7 @@ listen horizon
     balance {{ balance }}
     option httpchk GET /dashboard/auth/login/
     {% for h in groups['controller'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ horizon_http_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ horizon_http_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 listen barbican
@@ -275,7 +267,7 @@ listen barbican
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['barbican'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -285,7 +277,7 @@ listen barbican-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['barbican'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ barbican_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -296,7 +288,7 @@ listen heat
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -306,7 +298,7 @@ listen heat-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 
@@ -316,7 +308,7 @@ listen heat-cfn
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -326,7 +318,7 @@ listen heat-cfn-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['heat'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ heat_cfn_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 {% endif %}
@@ -338,7 +330,7 @@ listen magnum
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['magnum'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -348,7 +340,7 @@ listen magnum-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['magnum'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ magnum_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 {% endif %}
@@ -360,7 +352,7 @@ listen octavia
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['octavia'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 
 {% if keepalived_vip_svc %}
@@ -370,7 +362,7 @@ listen octavia-public
     balance {{ balance }}
     option httpchk GET /
     {% for h in groups['octavia'] %}
-    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }}
+    server {{ h }} {{ hostvars[h].ansible_host }}:{{ octavia_port }} check inter {{ inter }} rise {{ rise }} fall {{ fall }} on-marked-down shutdown-sessions
     {% endfor %}
 {% endif %}
 {% endif %}
