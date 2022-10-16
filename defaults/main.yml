@@ -63,4 +63,12 @@ tls_server_key: "{{ tls_server_dir }}/server-key.pem"
 tls_server_cert: "{{ tls_server_dir }}/server-cert.pem"
 tls_server_ca_cert: "{{ tls_server_dir }}/ca-cert.pem"
 tls_server_cert_and_key: "{{ tls_server_dir }}/server.pem"
+tls_tmp_client: {
+  key: "{{ tls_tmp_dir }}/client-key.pem",
+}
+tls_client_dir: "{{ tls_server_dir }}"
+tls_client_key: "{{ tls_client_dir }}/client-key.pem"
+tls_client_cert: "{{ tls_client_dir }}/client-cert.pem"
+tls_client_ca_cert: "{{ tls_client_dir }}/ca-cert.pem"
+tls_client_cert_and_key: "{{ tls_client_dir }}/client.pem"
 ...
