@@ -25,6 +25,7 @@ heat_port: 8004
 heat_cfn_port: 8000
 magnum_port: 9511
 octavia_port: 9876
+ceph_rgw_port: 7480
 # balance: roundrobin, static-rr, leastconn, source, first. default: roundrobin
 balance: roundrobin
 # check interval in seconds default: 2s
